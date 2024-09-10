@@ -30,6 +30,7 @@ __repo__ = "https://github.com/dcooperdalrymple/CircuitPython_SynthKeyboard.git"
 import asyncio
 import random
 import time
+from micropython import const
 
 try:
     from typing import Callable
@@ -42,13 +43,13 @@ except ImportError:
 class KeyState:
     """An enum-like class representing states used by :class:`Key` and :class:`Keyboard`."""
 
-    NONE: int = 0
+    NONE: int = const(0)
     """Indicates that the key hasn't been activated in any way"""
 
-    PRESS: int = 1
+    PRESS: int = const(1)
     """Indicates that the key has been pressed"""
 
-    RELEASE: int = 2
+    RELEASE: int = const(2)
     """Indicates that the key has been released"""
 
 
@@ -441,26 +442,26 @@ class ArpeggiatorMode:
     class.
     """
 
-    UP: int = 0
+    UP: int = const(0)
     """Play notes based on ascending note value."""
 
-    DOWN: int = 1
+    DOWN: int = const(1)
     """Play notes based on descending note value."""
 
-    UPDOWN: int = 2
+    UPDOWN: int = const(2)
     """Play notes based on note value in ascending order then descending order. The topmost and
     bottommost notes will not be repeated.
     """
 
-    DOWNUP: int = 3
+    DOWNUP: int = const(3)
     """Play notes based on note value in descending order then ascending order. The topmost and
     bottommost notes will not be repeated.
     """
 
-    PLAYED: int = 4
+    PLAYED: int = const(4)
     """Play notes based on the time at which they were played (ascending)."""
 
-    RANDOM: int = 5
+    RANDOM: int = const(5)
     """Play notes in a random order."""
 
 
@@ -741,13 +742,13 @@ class Sequencer(Timer):
 class KeyboardMode:
     """An enum-like class representing Keyboard note handling modes."""
 
-    HIGH: int = 0
+    HIGH: int = const(0)
     """When the keyboard is set as this mode, it will prioritize the highest note value."""
 
-    LOW: int = 1
+    LOW: int = const(1)
     """When the keyboard is set as this mode, it will prioritize the lowest note value."""
 
-    LAST: int = 2
+    LAST: int = const(2)
     """When the keyboard is set as this mode, it will prioritize notes by the order in when they
     were played/appended.
     """
