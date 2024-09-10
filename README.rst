@@ -97,8 +97,8 @@ Usage Example
 
     keyboard = Keyboard()
 
-    keyboard.voice_press = lambda voice: print(f"Pressed: {voice.note.notenum:d}")
-    keyboard.voice_release = lambda voice: print(f"Released: {voice.note.notenum:d}")
+    keyboard.on_voice_press = lambda voice: print(f"Pressed: {voice.note.notenum:d}")
+    keyboard.on_voice_release = lambda voice: print(f"Released: {voice.note.notenum:d}")
 
     for i in range(1, 4):
         keyboard.append(i)

@@ -369,26 +369,26 @@ class Timer:
             self._now = time.monotonic() - self._step_time
         else:
             self._do_release()
-        if self.enabled:
-            self.enabled(self._active)
+        if self.on_enabled:
+            self.on_enabled(self._active)
 
-    enabled: Callable[[bool], None] = None
+    on_enabled: Callable[[bool], None] = None
     """The callback method that is called when :attr:`active` is changed. Must have 1 parameter for
     the current active state. Ie: :code:`def enabled(active):`
     """
 
-    step: Callable[[], None] = None
+    on_step: Callable[[], None] = None
     """The callback method that is called when a step is triggered. This callback will fire whether
     or not the step has pressed any notes. However, any pressed notes will occur before this
     callback is called.
     """
 
-    press: Callable[[int, float], None] = None
+    on_press: Callable[[int, float], None] = None
     """The callback method that is called when a timed step note is pressed. Must have 2 parameters
     for note value and velocity (0.0-1.0). Ie: :code:`def press(notenum, velocity):`.
     """
 
-    release: Callable[[int], None] = None
+    on_release: Callable[[int], None] = None
     """The callback method that is called when a timed step note is released. Must have 1 parameter
     for note value. Velocity is always assumed to be 0.0. Ie: :code:`def release(notenum):`.
     """
@@ -421,18 +421,18 @@ class Timer:
         pass
 
     def _do_step(self):
-        if self.step:
-            self.step
+        if callable(self.on_step):
+            self.on_step()
 
     def _do_press(self, notenum, velocity):
-        if self.press:
-            self.press(notenum, velocity)
+        if callable(self.on_press):
+            self.on_press(notenum, velocity)
             self._last_press.append(notenum)
 
     def _do_release(self):
-        if self.release and self._last_press:
+        if callable(self.on_release) and self._last_press:
             for notenum in self._last_press:
-                self.release(notenum)
+                self.on_release(notenum)
             self._last_press.clear()
 
 
@@ -720,7 +720,7 @@ class Sequencer(Timer):
         """
         return self._data[min(max(track, 0), self._tracks)]
 
-    step: Callable[[int], None] = None
+    on_step: Callable[[int], None] = None
     """The callback method that is called when a step is triggered. This callback will fire whether
     or not the step has any notes. However, any pressed notes will occur before this callback is
     called. Must have 1 parameter for sequencer position index. Ie: :code:`def step(pos):`.
@@ -734,8 +734,8 @@ class Sequencer(Timer):
                 self._do_press(note[0], note[1])
 
     def _do_step(self):
-        if self.step:
-            self.step(self._pos)
+        if callable(self.on_step):
+            self.on_step(self._pos)
 
 
 class KeyboardMode:
@@ -775,23 +775,23 @@ class Keyboard:
         self.max_voices = max_voices
         self._voices = [Voice(i) for i in range(self.max_voices)]
 
-    voice_press: Callable[[Voice], None] = None
+    on_voice_press: Callable[[Voice], None] = None
     """The callback method to be called when a voice is pressed. Must have 1 parameter for the
     :class:`Voice` object. Ie: :code:`def press(voice):`.
     """
 
-    voice_release: Callable[[Voice], None] = None
+    on_voice_release: Callable[[Voice], None] = None
     """The callback method to be called when a voice is released. Must have 1 parameter for the
     :class:`Voice` object. Velocity is always assumed to be 0.0. Ie: :code:`def release(voice):`.
     """
 
-    key_press: Callable[[int, int, float], None] = None
+    on_key_press: Callable[[int, int, float], None] = None
     """The callback method to be called when a :class:`Key` object is pressed. Must have 3
     parameters for keynum, note value, velocity (0.0-1.0), and keynum. Ie: :code:`def press(keynum,
     notenum, velocity):`.
     """
 
-    key_release: Callable[[int, int], None] = None
+    on_key_release: Callable[[int, int], None] = None
     """The callback method to be called when a :class:`Key` object is released. Must have 2
     parameters for keynum and note value. Velocity is always assumed to be 0.0. Ie: :code:`def
     release(keynum, notenum):`.
@@ -814,12 +814,13 @@ class Keyboard:
     @arpeggiator.setter
     def arpeggiator(self, value: Arpeggiator) -> None:
         if self._arpeggiator:
-            self._arpeggiator.press = None
-            self._arpeggiator.release = None
+            self._arpeggiator.on_enabled = None
+            self._arpeggiator.on_press = None
+            self._arpeggiator.on_release = None
         self._arpeggiator = value
-        self._arpeggiator.enabled = self._timer_enabled
-        self._arpeggiator.press = self._timer_press
-        self._arpeggiator.release = self._timer_release
+        self._arpeggiator.on_enabled = self._timer_enabled
+        self._arpeggiator.on_press = self._timer_press
+        self._arpeggiator.on_release = self._timer_release
 
     _mode: int = KeyboardMode.HIGH
 
@@ -920,12 +921,12 @@ class Keyboard:
                 if state == KeyState.PRESS:
                     velocity = self._keys[i].velocity
                     self.append(notenum, velocity, i)
-                    if callable(self.key_press):
-                        self.key_press(i, notenum, velocity)
+                    if callable(self.on_key_press):
+                        self.on_key_press(i, notenum, velocity)
                 else:  # KeyState.RELEASE
                     self.remove(notenum)
-                    if callable(self.key_release):
-                        self.key_release(i, notenum)
+                    if callable(self.on_key_release):
+                        self.on_key_release(i, notenum)
             await asyncio.sleep(delay)
 
     def _update(self) -> None:
@@ -1031,14 +1032,14 @@ class Keyboard:
 
     def _press_voice(self, voice: Voice, note: Note) -> None:
         voice.note = note
-        if self.voice_press:
-            self.voice_press(voice)
+        if callable(self.on_voice_press):
+            self.on_voice_press(voice)
 
     def _release_voice(self, voice: Voice | list):
         if type(voice) is list:
             for i in voice:
                 self._release_voice(i)
         elif voice.active:
-            if self.voice_release:
-                self.voice_release(voice)
+            if callable(self.on_voice_release):
+                self.on_voice_release(voice)
             voice.note = None

@@ -9,7 +9,7 @@ from synthkeyboard import Arpeggiator, ArpeggiatorMode, Keyboard, TimerStep
 
 keyboard = Keyboard()
 
-keyboard.voice_press = lambda voice: print(f"Pressed: {voice.note.notenum:d}")
+keyboard.on_voice_press = lambda voice: print(f"Pressed: {voice.note.notenum:d}")
 
 keyboard.arpeggiator = Arpeggiator(steps=TimerStep.QUARTER, mode=ArpeggiatorMode.UPDOWN)
 keyboard.arpeggiator.octaves = 1

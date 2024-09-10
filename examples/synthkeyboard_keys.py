@@ -18,7 +18,7 @@ keyboard = Keyboard(
     )
 )
 
-keyboard.voice_press = lambda voice: print(f"Pressed: {voice.note.notenum:d}")
-keyboard.voice_release = lambda voice: print(f"Released: {voice.note.notenum:d}")
+keyboard.on_voice_press = lambda voice: print(f"Pressed: {voice.note.notenum:d}")
+keyboard.on_voice_release = lambda voice: print(f"Released: {voice.note.notenum:d}")
 
 asyncio.run(keyboard.update())
