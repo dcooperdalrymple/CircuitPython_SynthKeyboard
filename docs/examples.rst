@@ -33,3 +33,13 @@ Demonstration of the sequencer.
 .. literalinclude:: ../examples/synthkeyboard_sequencer.py
     :caption: examples/synthkeyboard_sequencer.py
     :linenos:
+
+synthio & MIDI
+--------------
+
+Use the :class:`synthkeyboard.Keyboard` class to help allocate MIDI notes into a limited set of
+:class:`synthio.Note` objects using USB MIDI input and DAC/PWM audio playback.
+
+.. literalinclude:: ../examples/synthkeyboard_synthio.py
+    :caption: examples/synthkeyboard_synthio.py
+    :linenos:
