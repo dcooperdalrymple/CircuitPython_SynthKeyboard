@@ -47,7 +47,7 @@ dynamic = ["dependencies", "optional-dependencies"]
 [tool.setuptools]
 # TODO: IF LIBRARY FILES ARE A PACKAGE FOLDER,
 #       CHANGE `py_modules = ['...']` TO `packages = ['...']`
-packages = ["synthkeyboard"]
+py_modules = ["synthkeyboard"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}

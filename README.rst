@@ -42,8 +42,6 @@ Installing from PyPI
 .. note:: This library is not available on PyPI yet. Install documentation is included
    as a standard element. Stay tuned for PyPI availability!
 
-.. todo:: Remove the above note if PyPI version is/will be available at time of release.
-
 On supported GNU/Linux systems like the Raspberry Pi, you can install the driver locally `from
 PyPI <https://pypi.org/project/circuitpython-synthkeyboard/>`_.
 To install for current user:
@@ -93,8 +91,19 @@ Or the following command to update an existing version:
 Usage Example
 =============
 
-.. todo:: Add a quick, simple example. It and other examples should live in the
-examples folder and be included in docs/examples.rst.
+.. code-block:: python
+
+    from synthkeyboard import Keyboard
+
+    keyboard = Keyboard()
+
+    keyboard.voice_press = lambda voice: print(f"Pressed: {voice.note.notenum:d}")
+    keyboard.voice_release = lambda voice: print(f"Released: {voice.note.notenum:d}")
+
+    for i in range(1, 4):
+        keyboard.append(i)
+    for i in range(3, 0, -1):
+        keyboard.remove(i)
 
 Documentation
 =============
